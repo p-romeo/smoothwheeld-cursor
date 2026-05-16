@@ -82,7 +82,7 @@ fn truncate(s: &str, max: usize) -> String {
 
 /// Scan every `/dev/input/event*`: print candidates; permission errors are non-fatal and listed.
 pub fn print_candidate_devices() -> Result<()> {
-    println!("{:<28} {:<30} {}", "PATH", "NAME", "WHEEL_CAPABILITIES");
+    println!("{:<28} {:<30} WHEEL_CAPABILITIES", "PATH", "NAME");
     for path in event_node_paths()? {
         match Device::open(&path) {
             Ok(device) => {
@@ -107,13 +107,12 @@ pub fn print_candidate_devices() -> Result<()> {
                 );
             }
             Err(e) => {
-                let msg = e.to_string();
-                if msg.contains("Permission denied") || msg.contains("denied") {
-                    warn!(path = %path.display(), error = %msg, "cannot open device");
+                if e.kind() == std::io::ErrorKind::PermissionDenied {
+                    warn!(path = %path.display(), error = %e, "cannot open device");
                 } else {
-                    debug!(path = %path.display(), error = %msg, "skipping device");
+                    debug!(path = %path.display(), error = %e, "skipping device");
                 }
-                println!("{:<28} {}", path.display(), msg);
+                println!("{:<28} {}", path.display(), e);
             }
         }
     }
@@ -137,7 +136,8 @@ pub fn resolve_device_name(name_substring: &str) -> Result<PathBuf> {
             matches.push((path, device.name().unwrap_or("").to_string()));
         }
     }
-    matches.sort_by(|a, b| a.0.cmp(&b.0));
+    // `event_node_paths()` already returns paths sorted, so `matches` is in
+    // path order without an extra sort here.
     match matches.len() {
         0 => Err(Error::NoMatchingDevice {
             name: name_substring.to_string(),

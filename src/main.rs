@@ -44,15 +44,17 @@ fn main() -> ExitCode {
 }
 
 fn run_smoothing(cli: &Cli) -> Result<(), Error> {
+    if cli.grab {
+        return Err(Error::Msg {
+            msg: "grab mode is not yet implemented — see plan.md Phase 9".to_string(),
+        });
+    }
+
     let device_path = devices::resolve_device_path(cli)?.ok_or(Error::NoDevice)?;
 
     if cli.dry_run {
-        return input::dry_run_wheel_events(&device_path).map_err(Into::into);
+        return input::dry_run_wheel_events(&device_path);
     }
 
-    tracing::info!("main loop not yet implemented — see plan.md Phase 4–5");
-    Err(Error::Msg {
-        msg: "main loop not implemented; use --list-devices, --dry-run, or follow plan.md Phase 4+"
-            .to_string(),
-    })
+    input::run_loop(&device_path)
 }
