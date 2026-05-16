@@ -1,0 +1,14 @@
+---
+description: Use plan.md as the authoritative roadmap for smoothwheeld feature work
+alwaysApply: true
+---
+
+# Refer to `plan.md`
+
+Before designing or implementing **new features**, **changes to CLI/config**, **packaging**, or **behavior** that affects scrolling, devices, or permissions:
+
+1. Open and follow **`plan.md`** in the repository root (architecture, phases, safety model, CLI/config contracts, known limitations).
+2. Keep changes aligned with the documented phases and requirements unless the user explicitly approves a deliberate departure.
+3. When adding capability, update **`plan.md`** only if the user asks to revise the plan—not as a substitute for implementing agreed behavior.
+
+This project’s intent and constraints live in `plan.md`; treat it as the source of truth for *what* to build and *how* to keep it safe.
